@@ -1,0 +1,48 @@
+---
+title: Lambda Web Functions Walkthrough
+description: Deploy Node.js web apps and HTTP APIs on AWS Lambda without adapters — Express, Hono, SSR, and streaming endpoints on serverless infrastructure.
+---
+
+import { Aside, LinkCard, CardGrid, LinkButton } from "@astrojs/starlight/components";
+import Tooltip from "@/components/Tooltip.astro";
+import AwsFlow from "@/components/AwsFlow.astro";
+
+Same Node.js HTTP server you already write — on Lambda, without rewriting it as
+an event handler.
+
+<LinkButton href="/tooling/" variant="primary" icon="right-arrow">Get started</LinkButton>
+<LinkButton href="/concepts/" variant="secondary">Concepts</LinkButton>
+
+<Aside type="tip">
+  <Tooltip term="web-function" label="Web Functions" /> are for web apps and
+  HTTP APIs — Express, Hono, SSR, webhooks, streaming responses. Built-in HTTPS,
+  multi-concurrency, scale to zero, pay for
+  <Tooltip term="active-cpu" label="active CPU" /> not idle wait. No adapters.
+  No fleet to manage.
+</Aside>
+
+## This lab
+
+<AwsFlow
+  caption="Local listen → console create → prove → logs → optional CLI → teardown"
+  nodes={[
+    { glyph: "terminal", label: "Local listen", note: "demo/ on 127.0.0.1" },
+    { icon: "console", label: "Console create", note: "wf-hello / dev" },
+    { glyph: "curl", label: "Prove", note: "curl -i" },
+    { icon: "cloudwatch-logs", label: "Logs", note: "request id" },
+    { icon: "cli", label: "Optional CLI", note: "Express redeploy", tone: "muted" },
+    { icon: "alert", label: "Teardown", note: "delete wf-hello", tone: "warn" },
+  ]}
+/>
+
+~30–45 min. Public Application-managed URL — [tear down](/teardown/) when done.
+Regions / IAM → [Prerequisites](/prerequisites/).
+
+## Path
+
+<CardGrid>
+  <LinkCard title="Tooling" href="/tooling/" description="Node and curl" />
+  <LinkCard title="Prerequisites" href="/prerequisites/" description="Account, Regions, IAM" />
+  <LinkCard title="Concepts" href="/concepts/" description="Web vs Event vs MicroVMs" />
+  <LinkCard title="Start the walkthrough" href="/local-listen/" description="Local listen → create → prove → teardown" />
+</CardGrid>

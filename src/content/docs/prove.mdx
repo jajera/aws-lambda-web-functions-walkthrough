@@ -1,0 +1,31 @@
+---
+title: Prove
+description: Prove the Web Function endpoint with curl -i, request id headers, and Active ≠ healthy.
+---
+
+Use the HTTPS domain from endpoint `dev` (add `https://` for curl):
+
+```bash
+curl -i https://lvxhf915kxln3n60.fym.lambda-web.us-east-1.on.aws/
+```
+
+```text
+HTTP/1.1 200 OK
+Content-Type: application/json
+lambda-web-logstream: 2026/10/14/wf-hello[rev-3tmf9]3f28c6322c054a49b418a2ce4e1deae1
+lambda-web-request-id: DPPLGCX6PNSWLK6VWH5H4RNP54
+
+{"message":"Hello from Lambda Web!","path":"/"}
+```
+
+Expect **200** and that Hello body. Copy `lambda-web-request-id` and
+`lambda-web-logstream` for [Logs peek](/logs-peek/)
+([HTTP headers](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-http.html)).
+
+## Active ≠ healthy
+
+**Active** in the console only means the revision and endpoint exist — not that
+the process bound `AWS_LAMBDA_HTTP_ENDPOINT`. If curl fails while Active, check
+listen address, entrypoint, zip layout, then Logs.
+
+Next: [Logs peek](/logs-peek/).

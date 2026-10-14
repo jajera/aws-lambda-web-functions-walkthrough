@@ -1,0 +1,25 @@
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+.cursor/
+
+# Node / Starlight
+node_modules/
+dist/
+.astro/
+.cache/
+
+# Local secrets / live lab leftovers (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# CLI `aws lambda-web deploy --hello-world` starter dir (local only)
+/wf-hello/
+
+# Optional Express zip from demo/ (local only)
+/wf-hello.zip

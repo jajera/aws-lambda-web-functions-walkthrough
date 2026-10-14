@@ -1,0 +1,389 @@
+---
+/**
+ * AwsFlow — a lightweight diagram of labelled nodes connected by arrows.
+ *
+ * Nodes render official AWS Architecture icons (vendored under
+ * /images/aws-icons/) or a small set of plain glyphs for non-AWS actors
+ * (client, curl, browser, local terminal). Connectors are real arrows, not
+ * ASCII. Theme-aware and accessible.
+ *
+ * Usage (MDX):
+ *   <AwsFlow
+ *     caption="Request path"
+ *     nodes={[
+ *       { glyph: "curl", label: "curl -i", note: "HTTPS :443" },
+ *       { icon: "lambda", label: "Endpoint", note: "TLS + auth" },
+ *       { icon: "lambda", label: "Your Node server", note: "listen(env)" },
+ *     ]}
+ *   />
+ */
+
+export interface FlowNode {
+  /** Vendored AWS icon key, e.g. "lambda", "cloudwatch", "iam". */
+  icon?: string;
+  /** Non-AWS glyph actor: client | browser | curl | terminal | code | check | cross. */
+  glyph?: string;
+  /** Primary label under the node. */
+  label: string;
+  /** Optional smaller sub-label. */
+  note?: string;
+  /** Optional short badge shown on the node (e.g. "public", "Active"). */
+  badge?: string;
+  /** Tone for badge / emphasis: accent | warn | ok | muted. */
+  tone?: "accent" | "warn" | "ok" | "muted";
+  /** Text to show on the connector arriving at this node. */
+  edge?: string;
+}
+
+interface Props {
+  nodes: FlowNode[];
+  /** Lay out horizontally (default) or vertically. */
+  direction?: "row" | "column";
+  /** Short caption rendered above the diagram and used as the aria-label. */
+  caption?: string;
+  /** Connector style between nodes. */
+  arrow?: "arrow" | "bidir" | "none";
+}
+
+const {
+  nodes,
+  direction = "row",
+  caption,
+  arrow = "arrow",
+} = Astro.props as Props;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const glyphs: Record<string, string> = {
+  client:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>',
+  browser:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 9h18"/><circle cx="6" cy="6.5" r="0.6" fill="currentColor" stroke="none"/><circle cx="8.2" cy="6.5" r="0.6" fill="currentColor" stroke="none"/></svg>',
+  curl: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>',
+  terminal:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>',
+  code: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></svg>',
+  check:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>',
+  cross:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+};
+
+const altText = (n: FlowNode) =>
+  n.icon
+    ? `${n.label} (AWS ${n.icon} icon)`
+    : `${n.label}`;
+
+const ariaLabel =
+  caption ?? `Diagram: ${nodes.map((n) => n.label).join(" then ")}`;
+
+/** Equal-size node tracks with auto-sized edge gutters between them. */
+const trackColumns =
+  direction === "row"
+    ? nodes
+        .map((_, i) => (i === 0 ? "minmax(0, 1fr)" : "auto minmax(0, 1fr)"))
+        .join(" ")
+    : "minmax(0, 1fr)";
+---
+
+<figure class={`aws-flow aws-flow--${direction}`} role="img" aria-label={ariaLabel}>
+  {caption && <figcaption class="aws-flow__caption">{caption}</figcaption>}
+  <div class="aws-flow__track" style={`--aws-flow-cols: ${trackColumns}`}>
+    {
+      nodes.map((n, i) => (
+        <>
+          {i > 0 && arrow !== "none" && (
+            <div class={`aws-flow__edge aws-flow__edge--${arrow}`} aria-hidden="true">
+              {n.edge && <span class="aws-flow__edge-label">{n.edge}</span>}
+              <span class="aws-flow__edge-line" />
+            </div>
+          )}
+          <div class={`aws-flow__node${n.tone ? ` aws-flow__node--${n.tone}` : ""}`}>
+            <div class="aws-flow__icon">
+              {n.icon ? (
+                <img
+                  src={`${base}/images/aws-icons/${n.icon}.svg`}
+                  alt={altText(n)}
+                  width="48"
+                  height="48"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <span class="aws-flow__glyph" set:html={glyphs[n.glyph ?? "code"] ?? glyphs.code} />
+              )}
+            </div>
+            <div class="aws-flow__text">
+              <span class="aws-flow__label">{n.label}</span>
+              {n.note && <span class="aws-flow__note">{n.note}</span>}
+            </div>
+            {n.badge && <span class="aws-flow__badge">{n.badge}</span>}
+          </div>
+        </>
+      ))
+    }
+  </div>
+</figure>
+
+<style>
+  .aws-flow {
+    margin: 1.5rem 0;
+    padding: 1.1rem 1rem;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 0.75rem;
+    background:
+      radial-gradient(
+        ellipse 90% 60% at 20% -10%,
+        var(--patina-accent-soft, transparent),
+        transparent 70%
+      ),
+      var(--sl-color-bg-sidebar);
+  }
+
+  .aws-flow__caption {
+    display: block;
+    margin-bottom: 0.9rem;
+    font-family: var(--sl-font-headings, inherit);
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--sl-color-white);
+  }
+
+  .aws-flow__track {
+    display: grid;
+    grid-template-columns: var(--aws-flow-cols);
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+
+  /* Kill Starlight `.sl-markdown-content * + *` margin between siblings. */
+  .aws-flow__track > :global(*) {
+    margin-block: 0;
+  }
+
+  .aws-flow__node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    min-width: 0;
+    margin: 0;
+    position: relative;
+    padding: 0.75rem 0.6rem;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 0.6rem;
+    background: var(--sl-color-bg);
+    text-align: center;
+  }
+
+  .aws-flow--column .aws-flow__node {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    text-align: left;
+    width: 100%;
+    min-height: 4.75rem;
+  }
+
+  .aws-flow__node--accent {
+    border-color: var(--sl-color-accent);
+    box-shadow: 0 0 0 1px var(--sl-color-accent) inset;
+  }
+
+  .aws-flow__node--warn {
+    border-color: color-mix(in oklab, orange 60%, var(--sl-color-hairline));
+  }
+
+  .aws-flow__node--ok {
+    border-color: color-mix(in oklab, #22c55e 55%, var(--sl-color-hairline));
+  }
+
+  .aws-flow__node--muted {
+    opacity: 0.72;
+  }
+
+  .aws-flow__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+
+  .aws-flow__icon img {
+    width: 48px;
+    height: 48px;
+    display: block;
+  }
+
+  .aws-flow__glyph :global(svg) {
+    width: 40px;
+    height: 40px;
+    fill: none;
+    stroke: var(--sl-color-accent);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .aws-flow__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    line-height: 1.3;
+  }
+
+  .aws-flow__label {
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--sl-color-white);
+    overflow-wrap: anywhere;
+  }
+
+  .aws-flow__note {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    overflow-wrap: anywhere;
+  }
+
+  .aws-flow__badge {
+    position: absolute;
+    top: -0.55rem;
+    inset-inline-end: 0.4rem;
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    background: var(--sl-color-accent);
+    color: var(--sl-color-text-invert);
+    white-space: nowrap;
+  }
+
+  .aws-flow__node--warn .aws-flow__badge {
+    background: color-mix(in oklab, orange 85%, white);
+    color: #231300;
+  }
+
+  .aws-flow__node--ok .aws-flow__badge {
+    background: #22c55e;
+    color: #04210f;
+  }
+
+  /* Connectors */
+  .aws-flow__edge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    min-width: 2.1rem;
+    margin: 0;
+    align-self: center;
+  }
+
+  .aws-flow__edge-label {
+    font-size: 0.68rem;
+    color: var(--sl-color-gray-3);
+    white-space: nowrap;
+    max-width: 7rem;
+    text-align: center;
+  }
+
+  .aws-flow__edge-line {
+    position: relative;
+    width: 1.6rem;
+    height: 2px;
+    background: var(--sl-color-accent);
+    opacity: 0.85;
+  }
+
+  .aws-flow__edge-line::after {
+    content: "";
+    position: absolute;
+    inset-inline-end: -1px;
+    top: 50%;
+    translate: 0 -50%;
+    border-block: 4px solid transparent;
+    border-inline-start: 6px solid var(--sl-color-accent);
+  }
+
+  .aws-flow__edge--bidir .aws-flow__edge-line::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: -1px;
+    top: 50%;
+    translate: 0 -50%;
+    border-block: 4px solid transparent;
+    border-inline-end: 6px solid var(--sl-color-accent);
+  }
+
+  /* In column layout, rotate the connector to point downward */
+  .aws-flow--column .aws-flow__edge {
+    min-width: 0;
+    align-self: start;
+    margin-inline-start: 1.5rem;
+    flex-direction: row;
+  }
+
+  .aws-flow--column .aws-flow__edge-line {
+    width: 2px;
+    height: 1.4rem;
+  }
+
+  .aws-flow--column .aws-flow__edge-line::after {
+    inset-inline-end: 50%;
+    top: unset;
+    bottom: -1px;
+    translate: 50% 0;
+    border-inline: 4px solid transparent;
+    border-block-start: 6px solid var(--sl-color-accent);
+    border-inline-start: 0;
+  }
+
+  .aws-flow--column .aws-flow__edge-label {
+    margin-inline-start: 0.4rem;
+  }
+
+  @media (max-width: 50rem) {
+    .aws-flow--row .aws-flow__track {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .aws-flow--row .aws-flow__node {
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.75rem;
+      text-align: left;
+      min-height: 4.75rem;
+    }
+
+    .aws-flow--row .aws-flow__edge {
+      flex-direction: row;
+      align-self: start;
+      margin-inline-start: 1.5rem;
+      min-width: 0;
+    }
+
+    .aws-flow--row .aws-flow__edge-line {
+      width: 2px;
+      height: 1.1rem;
+    }
+
+    .aws-flow--row .aws-flow__edge-line::after {
+      inset-inline-end: 50%;
+      top: unset;
+      bottom: -1px;
+      translate: 50% 0;
+      border-inline: 4px solid transparent;
+      border-block-start: 6px solid var(--sl-color-accent);
+      border-inline-start: 0;
+    }
+  }
+</style>

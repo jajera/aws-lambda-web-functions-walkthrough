@@ -1,0 +1,101 @@
+---
+title: Optional Express and CLI
+description: Redeploy wf-hello with Express via console zip or aws lambda-web after passing the CLI gate.
+---
+
+Skip if Hello World was enough — still [tear down](/teardown/) afterward.
+Pass the [CLI gate](/prerequisites/#cli-gate-optional-path) before path B.
+
+Both paths use `demo/` and create a new revision under **Latest revision**.
+
+## A — console zip
+
+Fewer leftovers than `deploy`.
+
+```bash
+cd demo
+```
+
+```bash
+npm ci --omit=dev
+```
+
+```text
+added 65 packages, and audited 66 packages in 470ms
+
+28 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+```
+
+```bash
+zip -rq ../wf-hello.zip index.js package.json package-lock.json node_modules && ls -lh ../wf-hello.zip
+```
+
+```text
+-rw-rw-r-- 1 johna johna 870K Oct 15 06:57 wf-hello.zip
+```
+
+Console → `wf-hello` → upload `wf-hello.zip` as a new revision → wait
+**Active**. Native modules need **Arm64** (this demo has none).
+
+## B — CLI deploy
+
+May create an IAM role and S3 objects — clean up in [Teardown](/teardown/).
+
+```bash
+aws lambda-web deploy --name wf-hello --code ./demo --region us-east-1
+```
+
+```text
+Creating deployment package ...
+Warning: skipped 58 hidden paths: node_modules/.package-lock.json, node_modules/es-errors/.github, node_modules/es-errors/.eslintrc, node_modules/object-inspect/.github, node_modules/object-inspect/.eslintrc, ... and 53 more. Use --include-hidden-files to include hidden files and directories that don't match an exclusion pattern.
+Preparing Amazon S3 bucket ...
+Uploading deployment package ...
+Creating Web Function revision ...
+Waiting for revision rev-rzpav to become active (timeout 600s) ...
+Waiting for revision to become active (state Pending, 0s elapsed, timeout 600s) ...
+Endpoint 'dev' auto-deploys the latest revision and will serve the new revision after it becomes Active.
+Waiting for endpoint 'dev' to become active (timeout 600s) ...
+https://lvxhf915kxln3n60.fym.lambda-web.us-east-1.on.aws
+Console: https://us-east-1.console.aws.amazon.com/lambda/home#/web-functions/wf-hello
+```
+
+## Prove Express
+
+```bash
+curl -i https://lvxhf915kxln3n60.fym.lambda-web.us-east-1.on.aws/
+```
+
+```text
+HTTP/1.1 200 OK
+Date: Wed, 14 Oct 2026 17:57:12 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 57
+X-Powered-By: Express
+ETag: W/"39-0QOuaz0pG4/ox2m4jmgHgCgHsYY"
+lambda-web-logstream: 2026/10/14/wf-hello[rev-rzpav]9e65f5be2ac846d98cc0a01078c93804
+lambda-web-request-id: XRZS6MKOYRZVYUKLFW437E3MPA
+
+{"message":"Hello from Lambda Web Functions!","path":"/"}
+```
+
+```bash
+curl -i https://lvxhf915kxln3n60.fym.lambda-web.us-east-1.on.aws/health
+```
+
+```text
+HTTP/1.1 200 OK
+Date: Wed, 14 Oct 2026 17:57:12 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 20
+X-Powered-By: Express
+ETag: W/"14-42nwGXkfHCFZ+m0t1l+wwUXCzf4"
+lambda-web-logstream: 2026/10/14/wf-hello[rev-rzpav]9e65f5be2ac846d98cc0a01078c93804
+lambda-web-request-id: 2V5ZSB43HU65WQQ7UZB4TEYFUQ
+
+{"status":"healthy"}
+```
+
+Next: [Go deeper](/go-deeper/) or [Teardown](/teardown/).

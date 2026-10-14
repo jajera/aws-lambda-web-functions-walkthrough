@@ -1,0 +1,54 @@
+---
+title: Troubleshooting
+description: Common Lambda Web Functions lab failures — missing nav, CLI gate, Active but failing curl.
+---
+
+import AwsFlow from "@/components/AwsFlow.astro";
+
+## No Web Functions nav
+
+<AwsFlow
+  caption="Confirm a launch Region, then confirm you are in Web Functions"
+  nodes={[
+    { icon: "region", label: "Supported Region?", note: "check Capabilities by Region — see Prerequisites" },
+    { icon: "region", label: "Switch + refresh", note: "if wrong Region", tone: "warn", edge: "no" },
+    { icon: "lambda", label: "Web Functions", note: "≠ Event Functions ≠ MicroVMs", tone: "ok", edge: "yes" },
+  ]}
+/>
+
+## `invalid choice: lambda-web`
+
+<AwsFlow
+  caption="Update the CLI, then retry the gate"
+  nodes={[
+    { icon: "toolkit", label: "aws update", tone: "warn" },
+    { icon: "cli", label: "aws lambda-web help", note: "retry the gate", edge: "then" },
+  ]}
+/>
+
+→ [Prerequisites — CLI gate](/prerequisites/#cli-gate-optional-path)
+
+## Active but curl fails
+
+<AwsFlow
+  direction="column"
+  caption="Work down the checklist; if it still fails, go to the logs"
+  nodes={[
+    { glyph: "code", label: "listen on AWS_LAMBDA_HTTP_ENDPOINT", note: "within ~10s of startup" },
+    { glyph: "code", label: "entry = index.js", note: "or AWS_LAMBDA_NODEJS_ENTRYPOINT", edge: "then" },
+    { icon: "s3", label: "zip root + prod node_modules", note: "native deps built for Arm64", edge: "then" },
+    { icon: "cloudwatch-logs", label: "Still failing → Logs", note: "search lambda-web-request-id", tone: "warn", edge: "else" },
+  ]}
+/>
+
+## Still public after "done"
+
+<AwsFlow
+  caption="If the URL still answers, teardown was skipped"
+  nodes={[
+    { icon: "alert", label: "Teardown not run", note: "URL still live", tone: "warn" },
+    { icon: "globe", label: "Delete wf-hello", note: "then re-verify", edge: "fix" },
+  ]}
+/>
+
+→ [Teardown](/teardown/)

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="AWS Lambda Web Functions Walkthrough">
+  <defs>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="1" fill="#22d3ee" fill-opacity="0.12"/>
+    </pattern>
+    <radialGradient id="glow" cx="18%" cy="0%" r="70%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#071014" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#071014"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <!-- favicon-style lambda + endpoint mark -->
+  <g transform="translate(72 96)">
+    <rect x="2" y="2" width="68" height="68" rx="14" fill="none" stroke="#22d3ee" stroke-width="4" stroke-opacity="0.45"/>
+    <path d="M20 56 36 20l14 36" fill="none" stroke="#22d3ee" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M36 20 30 38" fill="none" stroke="#22d3ee" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="55" cy="19" r="5" fill="#67e8f9"/>
+  </g>
+  <text x="72" y="220" fill="#22d3ee" font-family="Outfit, Noto Sans, Segoe UI, Helvetica, Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="0.06em">AWS LAMBDA WEB FUNCTIONS</text>
+  <text x="72" y="300" fill="#eef8fa" font-family="Outfit, Noto Sans, Segoe UI, Helvetica, Arial, sans-serif" font-size="52" font-weight="800">Run a Node HTTP server</text>
+  <text x="72" y="370" fill="#eef8fa" font-family="Outfit, Noto Sans, Segoe UI, Helvetica, Arial, sans-serif" font-size="52" font-weight="800">on Lambda — console first</text>
+  <text x="72" y="450" fill="#b7cdd4" font-family="Manrope, Noto Sans, Segoe UI, Helvetica, Arial, sans-serif" font-size="26">local listen · console create · curl prove · logs · optional CLI · teardown</text>
+  <text x="72" y="560" fill="#5a7a86" font-family="Manrope, Noto Sans, Segoe UI, Helvetica, Arial, sans-serif" font-size="20">aws-lambda-web-functions-walkthrough.johna.kiwi</text>
+</svg>

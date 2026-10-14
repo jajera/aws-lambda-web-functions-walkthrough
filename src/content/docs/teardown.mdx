@@ -1,0 +1,113 @@
+---
+title: Teardown
+description: Delete wf-hello and clean CLI leftovers so the Application-managed endpoint is gone.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Delete `wf-hello` when you finish. That removes the function, endpoints, and
+revisions.
+
+Console Hello World only → step 1. If you ran `aws lambda-web deploy`, also do
+step 2.
+
+## 1. Delete function
+
+**Console:** Web Functions → `wf-hello` → **Delete**. Type `confirm`, then
+**Delete**.
+
+![Delete function wf-hello dialog with confirm typed](/images/console-teardown-delete-confirm.png)
+
+**CLI:**
+
+```bash
+aws lambda-web delete-web-function --function-name wf-hello --region us-east-1
+```
+
+## 2. Leftovers (CLI deploy only)
+
+`delete-web-function` leaves the deploy role, S3 objects, and log groups.
+
+### S3 objects (keep the shared bucket)
+
+```bash
+aws s3 rm s3://awscli-lambdaweb-405087531484-us-east-1-an/lambda-web/wf-hello/ --recursive
+```
+
+```text
+delete: s3://awscli-lambdaweb-405087531484-us-east-1-an/lambda-web/wf-hello/20261014T175526Z-acabc763.zip
+delete: s3://awscli-lambdaweb-405087531484-us-east-1-an/lambda-web/wf-hello/20261014T110705Z-937789c5.zip
+```
+
+Your bucket name ends with a random suffix (`awscli-lambdaweb-…`). Delete
+objects only — not the bucket if shared.
+
+### CloudWatch log groups
+
+```bash
+aws logs delete-log-group --log-group-name /aws/lambda/web/wf-hello --region us-east-1
+```
+
+```bash
+aws logs delete-log-group --log-group-name /aws/lambda/web/wf-hello.local --region us-east-1
+```
+
+### IAM role
+
+Execution role for the CLI deploy (not a second function):
+
+```bash
+aws iam delete-role-policy --role-name awscli-lambdaweb-wf-hello --policy-name awscli-lambdaweb-logs
+```
+
+```bash
+aws iam delete-role --role-name awscli-lambdaweb-wf-hello
+```
+
+## 3. Verify
+
+```bash
+aws lambda-web list-web-functions --region us-east-1
+```
+
+```text
+{
+    "functions": []
+}
+```
+
+```bash
+curl -i https://lvxhf915kxln3n60.fym.lambda-web.us-east-1.on.aws/
+```
+
+```text
+HTTP/1.1 404 Not Found
+content-type: text/html
+lambda-web-request-id: AAO6RMBIF74TQAL5RBOQBKN3YE
+lambda-web-error-type: Platform.InvalidEndpoint
+content-length: 225
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTTP Error 404</title>
+</head>
+<body>
+    <h1>404 Not Found</h1>
+    <p>The requested endpoint could not be found.</p>
+    <p>Request ID: AAO6RMBIF74TQAL5RBOQBKN3YE</p>
+</body>
+</html>
+```
+
+```bash
+aws iam get-role --role-name awscli-lambdaweb-wf-hello
+```
+
+```text
+An error occurred (NoSuchEntity) when calling the GetRole operation: The role with name awscli-lambdaweb-wf-hello cannot be found.
+```
+
+<Aside type="caution">
+  Application-managed endpoints are public until delete finishes.
+</Aside>

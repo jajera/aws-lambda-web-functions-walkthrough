@@ -1,0 +1,214 @@
+---
+title: Prerequisites
+description: Account, launch Regions, and IAM needed for the Lambda Web Functions console and optional CLI paths.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+import Tooltip from "@/components/Tooltip.astro";
+import AwsFlow from "@/components/AwsFlow.astro";
+import AwsCards from "@/components/AwsCards.astro";
+
+## Time and cost
+
+<AwsCards
+  min="16rem"
+  items={[
+    { icon: "gear", title: "~30–45 min", desc: "Console path" },
+    { icon: "alert", title: "Pennies", desc: "If torn down promptly — requests + active CPU + memory while an env exists", tone: "warn" },
+  ]}
+/>
+
+## Region
+
+Web Functions is not available in every Region. Set a supported Region first.
+
+Initial Regions:
+
+- `us-east-1` — N. Virginia
+- `us-east-2` — Ohio
+- `us-west-2` — Oregon
+- `ap-northeast-1` — Tokyo
+- `eu-west-1` — Ireland
+
+Current list:
+[AWS Capabilities by Region](https://builder.aws.com/build/capabilities).
+
+![AWS Lambda console Region set to United States (N. Virginia) with Web Functions (New) in the left nav](/images/prerequisites-region-switcher.png)
+
+## Lab names
+
+<AwsCards
+  min="14rem"
+  items={[
+    { icon: "lambda", title: "wf-hello", desc: "Web Function", pick: true },
+    { icon: "globe", title: "dev", desc: "Endpoint", pick: true },
+  ]}
+/>
+
+## What create produces
+
+Always created (console or CLI):
+
+<AwsCards
+  min="18rem"
+  items={[
+    {
+      icon: "lambda",
+      title: "wf-hello + revision + endpoint dev",
+      desc: "auth: Application-managed (public)",
+      pick: true,
+      badge: "always",
+    },
+  ]}
+/>
+
+Only if you run `aws lambda-web deploy` (extras to clean up later):
+
+<AwsCards
+  min="14rem"
+  items={[
+    {
+      icon: "iam",
+      title: "IAM role awscli-lambdaweb-wf-hello",
+      desc: "only on aws lambda-web deploy",
+      tone: "muted",
+    },
+    {
+      icon: "s3",
+      title: "S3 prefix lambda-web/wf-hello/",
+      desc: "only on aws lambda-web deploy",
+      tone: "muted",
+    },
+    {
+      icon: "cloudwatch-logs",
+      title: "Log group /aws/lambda/web/wf-hello",
+      desc: "after first request (+ .local companion)",
+      tone: "muted",
+    },
+  ]}
+/>
+
+## IAM
+
+**Console:** manage Web Functions / revisions / endpoints · `iam:PassRole` ·
+use console role + code bucket.
+
+**CLI `deploy` (additive):** `sts:GetCallerIdentity` · S3 list/put/get/version ·
+if defaults: IAM create role + put policy · S3 create bucket + policy +
+versioning. Pass the [CLI gate](#cli-gate-optional-path) first.
+
+<Aside type="tip">
+  Console-only path → skip CLI leftovers. Never run <code>deploy</code> if you
+  want that.
+</Aside>
+
+## CLI gate (optional path)
+
+Skip this section if you stay on the AWS Management Console and curl only.
+
+<AwsFlow
+  caption="aws --version → aws lambda-web help → (on failure) aws update → retry aws lambda-web help"
+  nodes={[
+    { icon: "cli", label: "aws --version", note: "AWS CLI present?" },
+    { icon: "cli", label: "aws lambda-web help", note: "subcommand present?", edge: "then" },
+    {
+      glyph: "check",
+      label: "OK",
+      note: "optional Express and CLI pages",
+      tone: "ok",
+      edge: "success",
+    },
+    {
+      icon: "toolkit",
+      label: "aws update",
+      note: "retry aws lambda-web help",
+      tone: "warn",
+      edge: "invalid choice",
+    },
+  ]}
+/>
+
+```bash
+aws --version
+```
+
+```text
+aws-cli/2.37.4 Python/3.14.6 Linux/7.0.0-30-generic exe/x86_64.ubuntu.24
+```
+
+Your build string will differ. Note the version — you need a CLI that ships
+`lambda-web` (reference docs show **2.38.0+**).
+
+```bash
+aws lambda-web help
+```
+
+**Pass** — help lists Web Function commands:
+
+```text
+NAME
+       lambda-web -
+
+AVAILABLE COMMANDS
+       o create-web-function
+       o create-web-function-endpoint
+       o create-web-function-revision
+       o delete-resource-policy
+       o delete-web-function
+       o delete-web-function-endpoint
+       o delete-web-function-revision
+       o deploy
+       o get-resource-policy
+       o get-web-account-settings
+       o get-web-function
+       o get-web-function-endpoint
+       o get-web-function-revision
+       o list-tags
+       o list-web-function-endpoints
+       o list-web-function-revisions
+       o list-web-functions
+       o put-resource-policy
+       o tag-resource
+       o untag-resource
+       o update-web-function-endpoint
+       o wait
+```
+
+Gate passed → use the optional CLI later on
+[Optional Express and CLI](/optional-cli/).
+
+**Fail** — older CLI (authoring host evidence on `2.37.4`):
+
+```text
+aws: [ERROR]: An error occurred (ParamValidation): argument command: Found invalid choice 'lambda-web'
+
+
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+```
+
+Then update:
+
+```bash
+aws update
+```
+
+Output varies by how the AWS CLI was installed. When it finishes, retry:
+
+```bash
+aws lambda-web help
+```
+
+Expect the same **Pass** listing above.
+
+Still failing after update →
+[CLI install/update](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) ·
+[Troubleshooting](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-troubleshooting.html).
+
+<Aside type="note">
+  Authoring host once saw <code>aws-cli/2.37.4</code> fail the gate — always probe.
+</Aside>

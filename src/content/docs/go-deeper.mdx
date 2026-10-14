@@ -1,0 +1,52 @@
+---
+title: Go deeper
+description: Out-of-scope next steps — Serverless Land SSE dashboard, MultiRegion, CloudFront, and official samples.
+---
+
+import AwsCards from "@/components/AwsCards.astro";
+
+Outbound links — not lab steps. Always [tear down](/teardown/) `wf-hello`.
+
+<AwsCards
+  min="16rem"
+  items={[
+    {
+      glyph: "code",
+      title: "SSE metrics dashboard",
+      desc: "Serverless Land — concurrency + active CPU",
+      href: "https://serverlessland.com/patterns/lambda-web-sse-dashboard-nodejs-sam",
+    },
+    {
+      icon: "iam",
+      title: "MCP + IamAuth",
+      desc: "Serverless Land — Streamable HTTP + SigV4",
+      href: "https://serverlessland.com/patterns/lambda-web-mcp-server-nodejs-awscli",
+    },
+    {
+      icon: "region",
+      title: "MultiRegion / PerRegion",
+      desc: "Endpoint types and replication",
+      href: "https://docs.aws.amazon.com/lambda/latest/dg/web-functions-endpoints.html",
+    },
+    {
+      icon: "globe",
+      title: "CloudFront + OAC",
+      desc: "Custom domain, cache, restrict to CloudFront",
+      href: "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-lambda-web.html",
+    },
+    {
+      glyph: "box",
+      title: "Official samples",
+      desc: "Express, Hono, SSE, /region",
+      href: "https://docs.aws.amazon.com/lambda/latest/dg/web-functions-samples.html",
+    },
+    {
+      glyph: "shield",
+      title: "Best practices",
+      desc: "Auth, Arm64, concurrency, rollback",
+      href: "https://docs.aws.amazon.com/lambda/latest/dg/web-functions-best-practices.html",
+    },
+  ]}
+/>
+
+More: [AWS docs](/references/).

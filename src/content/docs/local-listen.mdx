@@ -1,0 +1,59 @@
+---
+title: Local listen
+description: Run a Node HTTP server on AWS_LAMBDA_HTTP_ENDPOINT before deploying to Lambda Web Functions.
+---
+
+import Tooltip from "@/components/Tooltip.astro";
+
+Your app listens on
+<Tooltip term="aws-lambda-http-endpoint" label="AWS_LAMBDA_HTTP_ENDPOINT" />
+(`host:port`). Locally you set it; on Lambda, Lambda sets it. Same listen code
+either way.
+
+## Run the demo
+
+From the repo root:
+
+```bash
+cd demo
+```
+
+```bash
+npm install
+```
+
+```text
+added 65 packages, and audited 66 packages in 1s
+```
+
+```bash
+AWS_LAMBDA_HTTP_ENDPOINT=127.0.0.1:3000 npm start
+```
+
+```text
+> wf-hello-demo@1.0.0 start
+> node index.js
+
+Server listening on 127.0.0.1:3000
+```
+
+Leave that process running. In another terminal:
+
+```bash
+curl http://127.0.0.1:3000/
+```
+
+```text
+{"message":"Hello from Lambda Web Functions!","path":"/"}
+```
+
+```bash
+curl http://127.0.0.1:3000/health
+```
+
+```text
+{"status":"healthy"}
+```
+
+Any server that binds `AWS_LAMBDA_HTTP_ENDPOINT` works — including the console
+Hello World template later.

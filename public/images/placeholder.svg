@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img">
+  <rect width="960" height="540" fill="#0b171c"/>
+  <rect x="24" y="24" width="912" height="492" fill="none" stroke="#22d3ee" stroke-width="2" stroke-dasharray="8 8" opacity="0.5"/>
+  <text x="480" y="260" text-anchor="middle" fill="#b7cdd4" font-family="system-ui,sans-serif" font-size="28">Screenshot placeholder</text>
+  <text x="480" y="300" text-anchor="middle" fill="#67e8f9" font-family="system-ui,sans-serif" font-size="16">Replace with a real console capture</text>
+</svg>
