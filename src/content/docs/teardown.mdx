@@ -31,16 +31,16 @@ aws lambda-web delete-web-function --function-name wf-hello --region us-east-1
 ### S3 objects (keep the shared bucket)
 
 ```bash
-aws s3 rm s3://awscli-lambdaweb-405087531484-us-east-1-an/lambda-web/wf-hello/ --recursive
+aws s3 rm s3://awscli-lambdaweb-123456789012-us-east-1-an/lambda-web/wf-hello/ --recursive
 ```
 
 ```text
-delete: s3://awscli-lambdaweb-405087531484-us-east-1-an/lambda-web/wf-hello/20261014T175526Z-acabc763.zip
-delete: s3://awscli-lambdaweb-405087531484-us-east-1-an/lambda-web/wf-hello/20261014T110705Z-937789c5.zip
+delete: s3://awscli-lambdaweb-123456789012-us-east-1-an/lambda-web/wf-hello/20261014T175526Z-acabc763.zip
+delete: s3://awscli-lambdaweb-123456789012-us-east-1-an/lambda-web/wf-hello/20261014T110705Z-937789c5.zip
 ```
 
-Your bucket name ends with a random suffix (`awscli-lambdaweb-…`). Delete
-objects only — not the bucket if shared.
+Replace `123456789012` and the bucket suffix with yours (`awscli-lambdaweb-…`).
+Delete objects only — not the bucket if shared.
 
 ### CloudWatch log groups
 
