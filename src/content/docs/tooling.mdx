@@ -1,0 +1,86 @@
+---
+title: Tooling
+description: Node and curl for the Lambda Web Functions walkthrough. Optional AWS CLI gate lives on Prerequisites.
+---
+
+import AwsCards from "@/components/AwsCards.astro";
+
+## Always
+
+<AwsCards
+  min="12rem"
+  items={[
+    {
+      icon: "console",
+      title: "AWS Management Console",
+      desc: "Browser for create, revisions, endpoints, and teardown",
+    },
+    {
+      glyph: "curl",
+      title: "curl",
+      desc: "Prove the HTTPS endpoint",
+    },
+    {
+      glyph: "code",
+      title: "Node.js 24+",
+      desc: "Local listen and Express demo",
+    },
+  ]}
+/>
+
+Confirm Node and curl before the walkthrough:
+
+```bash
+node --version
+```
+
+```text
+v24.14.1
+```
+
+Need **24+**. If lower, install a current Node LTS and retry.
+
+```bash
+curl --version
+```
+
+```text
+curl 8.5.0 (x86_64-pc-linux-gnu) libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3 brotli/1.1.0 zstd/1.5.5 libidn2/2.3.7 libpsl/0.21.2 (+libidn2/2.3.7) libssh/0.10.6/openssl/zlib nghttp2/1.59.0 librtmp/2.3 OpenLDAP/2.6.10
+Release-Date: 2023-12-06, security patched: 8.5.0-2ubuntu10.15
+Protocols: dict file ftp ftps gopher gophers http https imap imaps ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp
+Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
+```
+
+Any recent curl is fine — you need `-i` later on [Prove](/prove/).
+
+The AWS Management Console path needs **no** AWS CLI. If you will use
+[Optional Express and CLI](/optional-cli/), pass the
+[CLI gate on Prerequisites](/prerequisites/#cli-gate-optional-path) first.
+
+## Docs contributors
+
+From the repo root:
+
+```bash
+npm ci
+```
+
+```text
+added 472 packages, and audited 473 packages in 6s
+```
+
+```bash
+npm run dev
+```
+
+```text
+> aws-lambda-web-functions-walkthrough@1.0.0 dev
+> astro dev
+
+ astro  v7.3.8 ready in 1.04s
+
+┃ Local    http://localhost:4321/
+┃ Network  use --host to expose
+```
+
+Your ready time will differ. Open the Local URL and follow the sidebar.

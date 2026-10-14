@@ -1,0 +1,54 @@
+---
+title: Console create
+description: Create Web Function wf-hello and endpoint dev in the AWS Lambda console.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+import Tooltip from "@/components/Tooltip.astro";
+
+Create one
+<Tooltip term="web-function" label="Web Function" />.
+That also creates the first
+<Tooltip term="revision" label="revision" />
+and endpoint `dev`.
+
+## Open Web Functions
+
+1. Open the [Lambda console](https://console.aws.amazon.com/lambda/).
+2. Set a [supported Region](/prerequisites/#region).
+3. In the left nav, choose **Web Functions** (not **Event Functions**).
+
+![Lambda left nav with Web Functions (New) selected and empty Web Functions list](/images/console-create-web-functions-nav.png)
+
+4. Choose **Create Web Function**.
+
+## Create form
+
+### Basic information
+
+| Field | Value |
+| --- | --- |
+| Function name | `wf-hello` |
+| Runtime | **Node.js 24.x** |
+| Code source | **Hello World template** |
+
+![Create Web Function basic information with wf-hello, Node.js 24.x, and Hello World template](/images/console-create-form-basic.png)
+
+### Endpoint configuration
+
+| Field | Value |
+| --- | --- |
+| Endpoint name | `dev` |
+| Endpoint type | **Home-Region** |
+| Auth | <Tooltip term="application-managed" label="Application-managed authentication" /> (public) |
+| Deployment | **Latest revision** |
+
+![Endpoint configuration with name dev, Home-Region, Application-managed authentication, and Latest revision](/images/console-create-form-endpoint.png)
+
+Choose **Create Web Function**.
+
+<Aside type="caution">
+  The endpoint URL is public until <a href="/teardown/">Teardown</a>.
+</Aside>
+
+Next: [Revisions and endpoints](/revisions-endpoints/).

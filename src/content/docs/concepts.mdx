@@ -1,0 +1,67 @@
+---
+title: Concepts
+description: Web Functions vs Event Functions vs MicroVMs, and the three resources — function, revision, endpoint.
+---
+
+import Tooltip from "@/components/Tooltip.astro";
+import AwsFlow from "@/components/AwsFlow.astro";
+import AwsCards from "@/components/AwsCards.astro";
+
+## Which Lambda type?
+
+This lab uses a
+<Tooltip term="web-function" label="Web Function" />.
+
+| Type | Use when |
+| --- | --- |
+| **Web Function** | HTTP — Express, Hono, SSR, streaming |
+| **Event Function** | Events — SQS, S3, EventBridge, streams |
+| **MicroVMs** | Untrusted or isolated sandbox workloads |
+
+## Three resources
+
+A Web Function has revisions and endpoints:
+
+- <Tooltip term="web-function" label="Web Function" /> `wf-hello` — the resource
+- <Tooltip term="revision" label="Revision" /> — immutable code + config (`Pending` → `Active`)
+- <Tooltip term="endpoint" label="Endpoint" /> `dev` — HTTPS URL that routes to an Active revision
+
+Traffic only when the **endpoint** and the **revision** are both Active.
+
+## Request path
+
+<AwsFlow
+  caption="Client → endpoint → environment → your server"
+  nodes={[
+    { glyph: "client", label: "Client", note: "curl / browser" },
+    { icon: "globe", label: "Endpoint", note: "TLS + auth", edge: "HTTPS" },
+    { icon: "lambda", label: "Execution env", note: "multi-concurrency", edge: "HTTP" },
+    { glyph: "code", label: "Your Node server", note: "listen on AWS_LAMBDA_HTTP_ENDPOINT" },
+  ]}
+/>
+
+No API Gateway adapter. Each environment serves many concurrent requests.
+`maxConcurrencyPerEnvironment` (revision setting) bounds concurrency — range
+1–128, default 64. See
+[Scaling behavior for Lambda Web Functions](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-scaling.html).
+
+## Auth (this lab)
+
+<AwsCards
+  min="18rem"
+  items={[
+    {
+      icon: "globe",
+      title: "Application-managed",
+      desc: "Public URL — your app authenticates",
+      pick: true,
+      badge: "this lab",
+    },
+    {
+      icon: "iam",
+      title: "IamAuth",
+      desc: "SigV4 — not used in this lab",
+      tone: "muted",
+    },
+  ]}
+/>

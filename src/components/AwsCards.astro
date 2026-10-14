@@ -1,0 +1,251 @@
+---
+/**
+ * AwsCards — a grid of icon-led option cards. Good for decisions
+ * ("which Lambda type?"), capability summaries, and does/does-not splits
+ * where a plain table reads as a wall of text.
+ *
+ * Usage (MDX):
+ *   <AwsCards
+ *     items={[
+ *       { icon: "lambda", title: "Web Function", desc: "Express / Hono / SSR", pick: true },
+ *       { glyph: "code", title: "Event Function", desc: "SQS / S3 / EventBridge" },
+ *     ]}
+ *   />
+ *
+ * Prefer icon: for vendored AWS Architecture SVGs under /images/aws-icons/.
+ * Prefer glyph: only for non-AWS actors (browser | curl | terminal | code | …).
+ */
+
+export interface CardItem {
+  icon?: string;
+  glyph?: string;
+  title: string;
+  desc?: string;
+  /** When set, the card is an anchor (internal path or absolute URL). */
+  href?: string;
+  /** Highlight this card as the chosen / primary option. */
+  pick?: boolean;
+  /** Short badge, e.g. "this lab", "public". */
+  badge?: string;
+  tone?: "accent" | "warn" | "ok" | "muted";
+  /** Keep title/desc on one line (e.g. Region codes). */
+  nowrap?: boolean;
+}
+
+interface Props {
+  items: CardItem[];
+  /** Preferred minimum column width. */
+  min?: string;
+}
+
+const { items, min = "14rem" } = Astro.props as Props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const glyphs: Record<string, string> = {
+  client:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>',
+  browser:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 9h18"/><circle cx="6" cy="6.5" r="0.6" fill="currentColor" stroke="none"/><circle cx="8.2" cy="6.5" r="0.6" fill="currentColor" stroke="none"/></svg>',
+  curl: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>',
+  terminal:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>',
+  code: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></svg>',
+  shield:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/></svg>',
+  box: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg>',
+  check:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>',
+  cross:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+};
+---
+
+<div class="aws-cards" style={`--aws-cards-min:${min}`}>
+  {
+    items.map((it) => {
+      const className = `aws-cards__card${it.pick ? " aws-cards__card--pick" : ""}${it.tone ? ` aws-cards__card--${it.tone}` : ""}${it.nowrap ? " aws-cards__card--nowrap" : ""}${it.href ? " aws-cards__card--link" : ""}`;
+      const external = Boolean(it.href && /^https?:\/\//.test(it.href));
+      const iconEl = it.icon ? (
+        <img
+          src={`${base}/images/aws-icons/${it.icon}.svg`}
+          alt=""
+          width="40"
+          height="40"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <span class="aws-cards__glyph" set:html={glyphs[it.glyph ?? "code"] ?? glyphs.code} />
+      );
+      if (it.href) {
+        return (
+          <a
+            class={className}
+            href={it.href}
+            target={external ? "_blank" : undefined}
+            rel={external ? "noopener noreferrer" : undefined}
+          >
+            <div class="aws-cards__icon">{iconEl}</div>
+            <div class="aws-cards__body">
+              <span class="aws-cards__title">{it.title}</span>
+              {it.desc && <span class="aws-cards__desc">{it.desc}</span>}
+            </div>
+            {it.badge && <span class="aws-cards__badge">{it.badge}</span>}
+          </a>
+        );
+      }
+      return (
+        <div class={className}>
+          <div class="aws-cards__icon">{iconEl}</div>
+          <div class="aws-cards__body">
+            <span class="aws-cards__title">{it.title}</span>
+            {it.desc && <span class="aws-cards__desc">{it.desc}</span>}
+          </div>
+          {it.badge && <span class="aws-cards__badge">{it.badge}</span>}
+        </div>
+      );
+    })
+  }
+</div>
+
+<style>
+  .aws-cards {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  /* Kill Starlight `.sl-markdown-content * + *` margin between siblings. */
+  .aws-cards > :global(*) {
+    margin-block: 0;
+  }
+
+  .aws-cards__card {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    position: relative;
+    box-sizing: border-box;
+    flex: 1 1 var(--aws-cards-min, 14rem);
+    min-width: 0;
+    margin: 0;
+    padding: 0.85rem 0.9rem;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 0.65rem;
+    background: var(--sl-color-bg-sidebar);
+  }
+
+  a.aws-cards__card--link {
+    text-decoration: none;
+    color: inherit;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  a.aws-cards__card--link:hover {
+    border-color: var(--sl-color-accent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--sl-color-accent) 40%, transparent);
+  }
+
+  a.aws-cards__card--link:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+
+  .aws-cards__card--pick {
+    border-color: var(--sl-color-accent);
+    box-shadow: 0 0 0 1px var(--sl-color-accent) inset;
+    background:
+      radial-gradient(
+        ellipse 100% 80% at 15% 0%,
+        var(--patina-accent-soft, transparent),
+        transparent 70%
+      ),
+      var(--sl-color-bg-sidebar);
+  }
+
+  .aws-cards__card--warn {
+    border-color: color-mix(in oklab, orange 55%, var(--sl-color-hairline));
+  }
+
+  .aws-cards__card--ok {
+    border-color: color-mix(in oklab, #22c55e 50%, var(--sl-color-hairline));
+  }
+
+  .aws-cards__card--muted {
+    opacity: 0.72;
+  }
+
+  .aws-cards__icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  .aws-cards__icon img {
+    width: 40px;
+    height: 40px;
+    display: block;
+  }
+
+  .aws-cards__glyph :global(svg) {
+    width: 34px;
+    height: 34px;
+    fill: none;
+    stroke: var(--sl-color-accent);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .aws-cards__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    line-height: 1.35;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .aws-cards__title {
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--sl-color-white);
+    overflow-wrap: break-word;
+  }
+
+  .aws-cards__desc {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    overflow-wrap: break-word;
+  }
+
+  .aws-cards__card--nowrap .aws-cards__title,
+  .aws-cards__card--nowrap .aws-cards__desc {
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
+
+  .aws-cards__badge {
+    position: absolute;
+    top: -0.55rem;
+    inset-inline-end: 0.5rem;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    background: var(--sl-color-accent);
+    color: var(--sl-color-text-invert);
+    white-space: nowrap;
+  }
+
+  .aws-cards__card--warn .aws-cards__badge {
+    background: color-mix(in oklab, orange 85%, white);
+    color: #231300;
+  }
+</style>

@@ -1,0 +1,31 @@
+---
+title: Revisions and endpoints
+description: Watch wf-hello revision and endpoint become Active and copy the HTTPS domain.
+---
+
+import Tooltip from "@/components/Tooltip.astro";
+
+After create, open `wf-hello`. Wait until both the
+<Tooltip term="revision" label="revision" />
+and
+<Tooltip term="endpoint" label="endpoint" />
+`dev` show **Active**. Then copy the HTTPS domain.
+
+## Revisions
+
+Open the **Revisions** tab.
+
+![Revisions tab for wf-hello with latest revision Active](/images/console-revisions-tab.png)
+
+A revision is an immutable snapshot of code and config. New code creates a new
+revision. With **Latest revision** auto-deployment, traffic moves to each new
+Active revision.
+
+## Endpoints
+
+On **Overview**, under **Endpoints**, open `dev`. Wait for **Active**, then
+copy the domain (shape `….lambda-web.<region>.on.aws`).
+
+![Overview for wf-hello with endpoint dev Active and HTTPS domain](/images/console-revisions-endpoints-overview.png)
+
+Next: [Prove](/prove/).
